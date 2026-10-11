@@ -33,7 +33,7 @@ O cálculo é **determinístico e sem cache**: cada requisição executa o engin
 > **Escopo:** plataforma técnica de dimensionamento e estudo. Preço, orçamento comercial e payback **não fazem parte** deste projeto (decisão registrada no PRD §12).
 
 <p align="center">
-  <img src="imagem/Image.png" alt="Tela da plataforma — landing page" width="100">
+  <img src="imagem/Image.png" alt="Tela da plataforma — landing page" width="600">
 </p>
 
 ## Stack
