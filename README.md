@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE" Width="80"><img src="https://img.shields.io/badge/license-MIT-green" alt="Licença MIT" Width="80"></a>
+  <a href="LICENSE" Width="150"><img src="https://img.shields.io/badge/license-MIT-green" alt="Licença MIT" Width="150"></a>
   <img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen" alt="Node.js >= 18">
   <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/docker-ready-2496ED" alt="Docker">
