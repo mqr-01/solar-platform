@@ -1,0 +1,20 @@
+{
+  "name": "solar-dimensionamento-platform",
+  "version": "1.0.0",
+  "description": "Plataforma web de dimensionamento de sistemas solares fotovoltaicos (on-grid e off-grid)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "install:python": "python3 -m venv .venv && .venv/bin/python -m pip install -r python/requirements.txt",
+    "test": "node --test && npm run test:calc",
+    "test:api": "node --test",
+    "test:calc": "node scripts/python-runner.js test/test_ongrid_losses.py && node scripts/python-runner.js test/test_offgrid_calc.py"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

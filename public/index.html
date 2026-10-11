@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar Dimensionamento - Plataforma de Engenharia Solar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js" integrity="sha384-dug+JxfBvklEQdJ4AYuBBAIScUz0bVN73xpy273gcAwHjb3qI0fXmuYNaNfdyYJG" crossorigin="anonymous" defer></script>
+  <script src="/data-cresesb-hsp.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
+
+  <div id="memorialModal" class="modal" role="dialog" aria-labelledby="memorial-title" aria-modal="true" hidden>
+    <div class="modal-content" style="max-width: 720px; max-height: 90vh; overflow-y: auto; text-align: left;">
+      <h3 id="memorial-title" style="text-align: center; margin-bottom: 16px;">Memorial de Cálculo</h3>
+      <div id="memorial-body"></div>
+      <div style="display: flex; gap: 12px; justify-content: center; margin-top: 24px;">
+        <button type="button" class="btn btn-primary" id="memorialPrintBtn">Imprimir / Salvar PDF</button>
+        <button type="button" class="btn btn-secondary" id="memorialCloseBtn">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loadingOverlay" class="loading-overlay" role="alert" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <span class="loading-text">Calculando irradiância solar da sua região...</span>
+  </div>
+
+  <div id="orcamentoModal" class="modal" role="dialog" aria-labelledby="modal-title" aria-modal="true" hidden>
+    <div class="modal-content">
+      <h3 id="modal-title">Solicitar Orçamento</h3>
+      <p style="color: var(--text-muted); margin-bottom: 24px;">Preencha seus dados para receber um orçamento personalizado</p>
+      <form id="orcamentoForm" style="display: flex; flex-direction: column; gap: 16px; text-align: left;">
+        <label class="form-label" for="orc-nome">Nome completo</label>
+        <input type="text" id="orc-nome" placeholder="Nome completo" required class="input" autocomplete="name">
+        <label class="form-label" for="orc-email">Email</label>
+        <input type="email" id="orc-email" placeholder="Email" required class="input" autocomplete="email">
+        <label class="form-label" for="orc-whatsapp">WhatsApp</label>
+        <input type="tel" id="orc-whatsapp" placeholder="WhatsApp" required class="input" autocomplete="tel">
+        <div id="orcamento-error" class="form-error-summary hidden" role="alert" aria-live="polite"></div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Enviar Solicitação</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <header>
+    <div class="container">
+      <div class="logo">
+        <img src="/logo.png" alt="" width="40" height="40">
+        <span>Solar <span style="color: var(--accent-solar);">Dimensionamento</span></span>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section id="stage-landing" class="stage active">
+      <div class="hero">
+        <div class="container">
+          <h1>Descubra o sistema solar ideal para sua casa</h1>
+          <p>Simulação gratuita de dimensionamento fotovoltaico — On-Grid e Off-Grid. Engine de cálculo com Python + dados PVGIS-SARAH2.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="startBtn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Iniciar Simulação
+            </button>
+            <button class="btn btn-secondary" id="methodologyBtn">Ver Metodologia</button>
+          </div>
+        </div>
+      </div>
+
+      <section class="section how-it-works">
+        <div class="container">
+          <h2>Como funciona</h2>
+          <p>Processo em três etapas para um dimensionamento preciso</p>
+          <div class="grid-3">
+            <div class="step-card">
+              <div class="step-number" aria-hidden="true">1</div>
+              <div class="step-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M12 2v2M12 20v2M2 12h2M20 12h2"></path>
+                </svg>
+              </div>
+              <h3>Localização</h3>
+              <p>Informamos seu CEP para buscar coordenadas exatas e dados de irradiância solar via satélite (PVGIS-SARAH2)</p>
+            </div>
+            <div class="step-card">
+              <div class="step-number" aria-hidden="true">2</div>
+              <div class="step-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="16"></line>
+                </svg>
+              </div>
+              <h3>Perfil de Consumo</h3>
+              <p>Você informa seu consumo mensal (kWh) ou lista de equipamentos para calcular a curva de carga</p>
+            </div>
+            <div class="step-card">
+              <div class="step-number" aria-hidden="true">3</div>
+              <div class="step-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+              </div>
+              <h3>Resultado Técnico</h3>
+              <p>Receba o dimensionamento com todos os cálculos feitos e os equipamentos necessários para o sistema: painéis, geração horária, baterias, inversor e economia</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-sm" style="background: var(--primary-medium);">
+        <div class="container">
+          <div class="grid-3">
+            <div class="stat-card">
+              <div class="stat-value">98.5%</div>
+              <div class="stat-label">Precisão de Geração</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">&lt; 5s</div>
+              <div class="stat-label">Tempo de Cálculo</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">PVGIS-SARAH2 ou CRESESB</div>
+              <div class="stat-label">Base de Irradiância</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="stage-selection" class="stage">
+      <div class="container">
+        <button type="button" class="btn btn-secondary" data-back="stage-landing" style="margin-bottom: 24px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Voltar
+        </button>
+        <div style="text-align: center; margin-bottom: 48px;">
+          <h2 style="font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: 12px;">Selecione o tipo de sistema</h2>
+          <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">Escolha a configuração adequada para sua necessidade</p>
+        </div>
+        <div class="system-selection">
+          <div class="system-card card" data-system="ongrid">
+            <div class="system-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="6" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="11" x2="12" y2="16"></line>
+              </svg>
+            </div>
+            <h3>Conectado à Rede (On-Grid)</h3>
+            <p>Sistema ligado à concessionária. Gera energia durante o dia e você consome da rede à noite. Não requer baterias. Ideal para redução de conta de luz.</p>
+          </div>
+          <div class="system-card card" data-system="offgrid">
+            <div class="system-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </div>
+            <h3>Isolado com Baterias (Off-Grid)</h3>
+            <p>Sistema independente com banco de baterias. Ideal para áreas sem energia da rede, sítios, fazendas ou backup residencial completo.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="stage-ongrid" class="stage">
+      <div class="container form-container">
+        <button type="button" class="btn btn-secondary" data-back="stage-selection" style="margin-bottom: 24px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Voltar
+        </button>
+        <div style="max-width: 560px; margin: 0 auto 48px; text-align: center;">
+          <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 8px;">On-Grid — Simulação</h2>
+          <p style="color: var(--text-muted);">Preencha os dados para calcular seu dimensionamento</p>
+        </div>
+        <div class="form-section">
+          <form id="form-ongrid" class="card" novalidate>
+            <div id="ongrid-error" class="form-error-summary hidden" role="alert" aria-live="polite"></div>
+            <div class="form-group">
+              <label class="form-label" for="cep">CEP</label>
+              <input type="text" id="cep" class="input" placeholder="00000-000" maxlength="9" autocomplete="postal-code" required aria-describedby="cep-hint">
+              <span id="cep-hint" class="form-hint">Usado para buscar coordenadas e dados de irradiância solar da sua região</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="consumo-mensal">Consumo mensal (kWh)</label>
+              <input type="number" id="consumo-mensal" class="input" placeholder="Ex: 500" min="1" step="1" required aria-describedby="consumo-hint">
+              <span id="consumo-hint" class="form-hint">Some o consumo dos últimos 12 meses na conta de luz e divida por 12</span>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="area-disponivel">Área disponível (m²) <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">opcional</span></label>
+                <input type="number" id="area-disponivel" class="input" placeholder="Ex: 40" min="1" step="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="sombreamento">Sombreamento (%) <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">opcional</span></label>
+                <input type="number" id="sombreamento" class="input" placeholder="Ex: 10" min="0" max="30" step="1">
+                <span class="form-hint">Reduz a geração em 0–30% (árvores, prédios, sujeira)</span>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="tensao-rede">Tensão da rede (V)</label>
+                <select id="tensao-rede" class="input select">
+                  <option value="127" selected>127 V (monofásico)</option>
+                  <option value="220">220 V</option>
+                  <option value="380">380 V (trifásico)</option>
+                  <option value="110">110 V</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="distancia-cabo-ongrid">Distância do cabo (m)</label>
+                <input type="number" id="distancia-cabo-ongrid" class="input" placeholder="10" min="1" max="200" value="10">
+                <span class="form-hint">Usada para dimensionar a seção da fiação</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="margem-expansao">Margem de expansão futura (%) <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">opcional</span></label>
+              <input type="number" id="margem-expansao" class="input" placeholder="Ex: 20" min="0" max="100" step="5" aria-describedby="margem-hint">
+              <span id="margem-hint" class="form-hint">Prevê aumento de consumo futuro no dimensionamento (0–100%)</span>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="tarifa">Tarifa elétrica (R$/kWh)</label>
+                <input type="number" id="tarifa" class="input" placeholder="Ex: 0,85" min="0.3" max="3" step="0.01" value="0.85" aria-describedby="tarifa-hint">
+                <span id="tarifa-hint" class="form-hint">Valor da sua conta de luz por kWh</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="autoconsumo">% Autoconsumo</label>
+                <input type="number" id="autoconsumo" class="input" placeholder="Ex: 85" min="10" max="100" step="5" value="85" aria-describedby="autoconsumo-hint">
+                <span id="autoconsumo-hint" class="form-hint">% da energia gerada consumida no próprio momento</span>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="orientacao-ongrid">Orientação do telhado</label>
+                <select id="orientacao-ongrid" class="input select">
+                  <option value="180" selected>Sul (padrão)</option>
+                  <option value="0">Norte</option>
+                  <option value="45">Nordeste</option>
+                  <option value="90">Leste</option>
+                  <option value="135">Sudeste</option>
+                  <option value="225">Sudoeste</option>
+                  <option value="270">Oeste</option>
+                  <option value="315">Noroeste</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inclinacao-ongrid">Inclinação (°) <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">opcional</span></label>
+                <input type="number" id="inclinacao-ongrid" class="input" placeholder="Padrão: latitude local" min="0" max="90" step="1" aria-describedby="inclinacao-hint">
+                <span id="inclinacao-hint" class="form-hint">Ângulo do telhado (vazio = inclinação da latitude)</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="hsp-fonte-ongrid">Fonte da irradiância solar (HSP) <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">opcional</span></label>
+              <select id="hsp-fonte-ongrid" class="input select" aria-describedby="hsp-fonte-ongrid-hint">
+                <option value="" selected>Automático (CEP — PVGIS)</option>
+              </select>
+              <span id="hsp-fonte-ongrid-hint" class="form-hint">Padrão: PVGIS via CEP. Ou escolha sua cidade para ajustar ao HSP oficial do Atlas CRESESB</span>
+            </div>
+            <button type="submit" class="btn btn-primary submit-btn" style="max-width: 360px; width: 100%; margin: 24px auto 0; display: flex;">
+              <span class="btn-text">Simular Dimensionamento</span>
+              <span class="btn-loading hidden">
+                <svg style="width:20px;height:20px;border-width:3px;" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="30 30" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></svg>
+                Calculando...
+              </span>
+            </button>
+          </form>
+
+          <div id="ongrid-result" class="card hidden">
+            <button type="button" class="btn btn-secondary" data-back-form="ongrid" style="margin-bottom: 16px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              Voltar ao Formulário
+            </button>
+            <h3 style="margin-bottom: 24px; text-align: center;">Resultado da Simulação</h3>
+            <div class="grid-3" id="ongrid-cards" style="margin-bottom: 32px;"></div>
+            <div id="ongrid-detalhes"></div>
+            <div class="chart-container">
+              <canvas id="ongrid-chart" role="img" aria-label="Gráfico de geração e consumo estimado por hora do dia típico"></canvas>
+            </div>
+            <div style="margin-top: 32px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+              <button type="button" class="btn btn-primary" id="orcamentoBtn-ongrid">Solicitar Orçamento</button>
+              <button type="button" class="btn btn-secondary" id="memorialBtn-ongrid">Gerar Memorial</button>
+              <button type="button" class="btn btn-secondary" data-reset-form="ongrid">Nova Simulação</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="stage-offgrid" class="stage">
+      <div class="container form-container">
+        <button type="button" class="btn btn-secondary" data-back="stage-selection" style="margin-bottom: 24px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Voltar
+        </button>
+        <div style="max-width: 720px; margin: 0 auto 48px; text-align: center;">
+          <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 8px;">Off-Grid — Simulação</h2>
+          <p style="color: var(--text-muted);">Configure seus equipamentos e autonomia desejada</p>
+        </div>
+        <div class="form-section">
+          <form id="form-offgrid" class="card" novalidate>
+            <div id="offgrid-error" class="form-error-summary hidden" role="alert" aria-live="polite"></div>
+            <div class="form-group">
+              <label class="form-label" for="dias-autonomia">Dias de autonomia</label>
+              <input type="number" id="dias-autonomia" class="input" placeholder="2" min="1" max="10" value="2" required aria-describedby="autonomia-hint">
+              <span id="autonomia-hint" class="form-hint">Dias que o sistema deve funcionar apenas com baterias (sem sol)</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="offgrid-cep">CEP (opcional)</label>
+              <input type="text" id="offgrid-cep" class="input" placeholder="00000-000" maxlength="9" autocomplete="postal-code" aria-describedby="offgrid-cep-hint">
+              <span id="offgrid-cep-hint" class="form-hint">Usado para estimar a irradiação solar (HSP) da sua região via PVGIS</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="hsp-fonte-offgrid">Fonte da irradiância solar (HSP)</label>
+              <select id="hsp-fonte-offgrid" class="input select" aria-describedby="hsp-fonte-offgrid-hint">
+                <option value="" selected>Automático (CEP — PVGIS)</option>
+              </select>
+              <span id="hsp-fonte-offgrid-hint" class="form-hint">Padrão: PVGIS via CEP. Ou escolha sua cidade para usar o HSP oficial do Atlas CRESESB</span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="offgrid-distancia">Distância do cabo (m)</label>
+                <input type="number" id="offgrid-distancia" class="input" placeholder="10" min="1" max="200" value="10" aria-describedby="distancia-hint">
+                <span id="distancia-hint" class="form-hint">Usada para dimensionar a seção da fiação DC</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="offgrid-area">Área disponível (m²) <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">opcional</span></label>
+                <input type="number" id="offgrid-area" class="input" placeholder="Ex: 30" min="1" step="1">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="offgrid-hsp-critico">HSP crítico (dias nublados) <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">opcional</span></label>
+              <input type="text" id="offgrid-hsp-critico" class="input" placeholder="Ex: 3,5" inputmode="decimal" aria-describedby="hsp-critico-hint">
+              <span id="hsp-critico-hint" class="form-hint">Irradiação nos dias mais críticos. Se vazio, usa 80% do HSP informado</span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="offgrid-sombra">Sombreamento (%) <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">opcional</span></label>
+                <input type="number" id="offgrid-sombra" class="input" placeholder="Ex: 10" min="0" max="30" step="1">
+                <span class="form-hint">Reduz a irradiação efetiva (0–30%)</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="offgrid-margem">Margem de expansão (%) <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem;">opcional</span></label>
+                <input type="number" id="offgrid-margem" class="input" placeholder="Ex: 20" min="0" max="100" step="5">
+                <span class="form-hint">Prevê aumento de consumo futuro (0–100%)</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="tensao-sistema-offgrid">Tensão do banco (DC)</label>
+                <select id="tensao-sistema-offgrid" class="input select">
+                  <option value="48" selected>48 V (recomendado)</option>
+                  <option value="24">24 V</option>
+                  <option value="12">12 V</option>
+                </select>
+                <span class="form-hint">Tensão do banco de baterias e do barramento DC</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="tensao-inversor-ac">Tensão do inversor AC</label>
+                <select id="tensao-inversor-ac" class="input select" aria-describedby="tensao-inversor-ac-hint">
+                  <option value="220" selected>220 V (padrão)</option>
+                  <option value="127">127 V</option>
+                </select>
+                <span id="tensao-inversor-ac-hint" class="form-hint">Tensão de saída do inversor (disjuntor/cabo AC)</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="orientacao-offgrid">Orientação do telhado</label>
+              <select id="orientacao-offgrid" class="input select">
+                <option value="180" selected>Sul (padrão)</option>
+                <option value="0">Norte</option>
+                <option value="45">Nordeste</option>
+                <option value="90">Leste</option>
+                <option value="135">Sudeste</option>
+                <option value="225">Sudoeste</option>
+                <option value="270">Oeste</option>
+                <option value="315">Noroeste</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tipo de bateria</label>
+              <div class="battery-options" role="radiogroup" aria-label="Tipo de bateria">
+                <div class="battery-option">
+                  <input type="radio" name="bateria-tipo" value="chumbo_acido" id="bat-chumbo" checked>
+                  <label for="bat-chumbo">
+                    <span class="battery-name">Chumbo-ácido</span>
+                    <span class="battery-desc">Custo baixo · Vida 2-3 anos · DoD 50%</span>
+                  </label>
+                </div>
+                <div class="battery-option">
+                  <input type="radio" name="bateria-tipo" value="gel" id="bat-gel">
+                  <label for="bat-gel">
+                    <span class="battery-name">Gel (AGM)</span>
+                    <span class="battery-desc">Manutenção zero · Vida 3-5 anos · DoD 60%</span>
+                  </label>
+                </div>
+                <div class="battery-option">
+                  <input type="radio" name="bateria-tipo" value="litio_lifepo4" id="bat-litio">
+                  <label for="bat-litio">
+                    <span class="battery-name">LiFePO₄ (Lítio)</span>
+                    <span class="battery-desc">Custo maior · Vida 8-10 anos · DoD 90%</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Equipamentos <span style="font-weight:400;color:var(--text-muted);font-size:0.85rem;">(adicione todos os aparelhos)</span></label>
+              <div class="equipment-table" id="equipamentos-table"></div>
+              <button type="button" class="btn btn-secondary" id="add-equipment-btn" style="max-width: 360px; width: 100%; margin: 16px auto 0; display: flex;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Adicionar Equipamento
+              </button>
+            </div>
+
+            <button type="submit" class="btn btn-primary submit-btn" style="max-width: 360px; width: 100%; margin: 24px auto 0; display: flex;">
+              <span class="btn-text">Simular Dimensionamento</span>
+              <span class="btn-loading hidden">
+                <svg style="width:20px;height:20px;border-width:3px;" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="30 30" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></svg>
+                Calculando...
+              </span>
+            </button>
+          </form>
+
+          <div id="offgrid-result" class="card hidden">
+            <button type="button" class="btn btn-secondary" data-back-form="offgrid" style="margin-bottom: 16px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              Voltar ao Formulário
+            </button>
+            <h3 style="margin-bottom: 24px; text-align: center;">Resultado do Dimensionamento</h3>
+            <div class="grid-3" id="offgrid-cards" style="margin-bottom: 24px;"></div>
+            <div id="offgrid-detalhes"></div>
+            <div class="chart-container">
+              <canvas id="offgrid-chart" role="img" aria-label="Gráfico de barras do consumo diário por equipamento"></canvas>
+            </div>
+            <div style="text-align: center;">
+              <button type="button" class="btn btn-primary" id="orcamentoBtn-offgrid">Solicitar Orçamento</button>
+              <button type="button" class="btn btn-secondary" id="memorialBtn-offgrid" style="margin-left: 16px;">Gerar Memorial</button>
+              <button type="button" class="btn btn-secondary" data-reset-form="offgrid" style="margin-left: 16px;">Nova Simulação</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Plataforma de Dimensionamento Solar Fotovoltaico — Engenharia de Precisão com Python + PVGIS-SARAH2 + CRESESB</p>
+    </div>
+  </footer>
+</body>
+</html>
