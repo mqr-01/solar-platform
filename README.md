@@ -1,6 +1,3 @@
-<p align="center">
-  <img src="public/logo.png" alt="MP Solar — Solar Proposal" width="220">
-</p>
 
 <h1 align="center">Plataforma de Dimensionamento Solar Fotovoltaico</h1>
 
