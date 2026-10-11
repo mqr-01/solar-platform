@@ -7,10 +7,10 @@
 
 <p align="center">
   <a href="LICENSE" Width="150"><img src="https://img.shields.io/badge/license-MIT-green" alt="Licença MIT" Width="150"></a>
-  <img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen" alt="Node.js >= 18">
-  <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python 3.10+">
-  <img src="https://img.shields.io/badge/docker-ready-2496ED" alt="Docker">
-  <img src="https://img.shields.io/badge/testes-39%2F39-8A2BE2" alt="39/39 testes">
+  <img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen" alt="Node.js >= 18" Width="150">
+  <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python 3.10+" Width="150">
+  <img src="https://img.shields.io/badge/docker-ready-2496ED" alt="Docker" Width="150">
+  <img src="https://img.shields.io/badge/testes-39%2F39-8A2BE2" alt="39/39 testes" Width="150">
 </p>
 
 <p align="center">
